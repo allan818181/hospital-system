@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Doctor Dashboard</h2>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <a href="{% url 'lab_test_results' %}" class="btn btn-primary w-100">
+                <i class="bi bi-clipboard-data"></i> View Lab Test Results
+            </a>
+        </div>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search by patient name..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Today's Appointments</h3>
+        </div>
+        <div class="card-body">
+            {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.date_time|date:"h:i A" }}</td>
+                                    <td>
+                                        <a href="{% url 'patient_detail' appointment.patient.id %}" class="text-decoration-none">
+                                            {{ appointment.patient.user.get_full_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ appointment.reason }}</td>
+                                    <td>
+                                        <span class="badge {% if appointment.status == 'SCHEDULED' %}bg-primary{% elif appointment.status == 'COMPLETED' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if appointment.status == 'SCHEDULED' %}
+                                            <a href="{% url 'consultation' appointment.id %}" class="btn btn-sm btn-primary">Attend</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No appointments scheduled for today.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

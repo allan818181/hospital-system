@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Test Queue{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Lab Test Queue</h2>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search by patient name or test name..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'lab_test_queue' %}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lab Tests Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Pending Tests</h3>
+        </div>
+        <div class="card-body">
+            {% if lab_tests %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Test Name</th>
+                                <th>Requested By</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in lab_tests %}
+                                <tr>
+                                    <td>{{ test.created_at|date:"M d, Y" }}</td>
+                                    <td>{{ test.appointment.patient.user.get_full_name }}</td>
+                                    <td>{{ test.test_name }}</td>
+                                    <td>Dr. {{ test.requested_by.user.last_name }}</td>
+                                    <td>
+                                        <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                            {{ test.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'test_details' test.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        <a href="{% url 'update_lab_test' test.id %}" class="btn btn-sm btn-success">Update Results</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No pending lab tests found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

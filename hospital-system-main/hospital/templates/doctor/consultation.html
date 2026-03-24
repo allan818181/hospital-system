@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load hospital_extras %}
+
+{% block title %}Patient Consultation{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Patient Information</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ appointment.patient.user.get_full_name }}</p>
+                    <p><strong>Age:</strong> {{ appointment.patient.age }}</p>
+                    <p><strong>Gender:</strong> {{ appointment.patient.gender }}</p>
+                    <p><strong>Contact:</strong> {{ appointment.patient.user.phone }}</p>
+                </div>
+            </div>
+
+            
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Lab Tests</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Add Test Form -->
+                    <form method="post" action="{% url 'consultation' appointment.id %}" class="mb-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_lab_test">
+                        
+                        <div class="mb-3">
+                            <label for="test_name" class="form-label">Test Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="test_name" 
+                                   name="test_name" 
+                                   placeholder="e.g., Blood Test, X-Ray, etc."
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="instructions" class="form-label">Instructions</label>
+                            <textarea class="form-control" 
+                                      id="instructions" 
+                                      name="instructions" 
+                                      rows="2" 
+                                      placeholder="Enter specific instructions for the test..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="measurements" class="form-label">Required Measurements (comma-separated)</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="measurements" 
+                                   name="measurements" 
+                                   placeholder="e.g., Blood Pressure, Heart Rate, Temperature">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Test</button>
+                    </form>
+
+                    <!-- Pending Tests -->
+                    {% if pending_tests %}
+                        <div class="mb-4">
+                            <h5>Pending Tests</h5>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Test Name</th>
+                                            <th>Instructions</th>
+                                            <th>Measurements</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for test in pending_tests %}
+                                            <tr>
+                                                <td>{{ test.test_name }}</td>
+                                                <td>{{ test.instructions }}</td>
+                                                <td>{{ test.required_measurements|default:"None" }}</td>
+                                                <td>
+                                                    <form method="post" action="{% url 'consultation' appointment.id %}" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="remove_test">
+                                                        <input type="hidden" name="test_id" value="{{ test.id }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <form method="post" action="{% url 'consultation' appointment.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="submit_tests">
+                                <button type="submit" class="btn btn-success">Submit Tests to Lab</button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <!-- Requested Tests -->
+                    {% if lab_tests %}
+                        <hr>
+                        <h5>Requested Tests</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Status</th>
+                                        <th>Requested On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for test in lab_tests %}
+                                        <tr>
+                                            <td>{{ test.test_name }}</td>
+                                            <td>
+                                                <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                                    {{ test.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ test.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        
+{% endblock %} 

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to MediTrack{% endblock %}
+
+{% block auth_content %}
+<div class="container-fluid p-0">
+    <!-- Hero Section -->
+    <div class="hero-section text-center py-5">
+        <div class="hero-overlay"></div>
+        <div class="container position-relative">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 mb-4">Welcome to MediTrack</h1>
+                    <p class="lead mb-4">Streamline your healthcare management with our comprehensive hospital management system.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'dashboard_redirect' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Get Started</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container py-5">
+        <h2 class="text-center mb-5">Key Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box text-center p-4">
+                    <i class="bi bi-calendar-check display-4 mb-3"></i>
+                    <h3>Appointment Management</h3>
+                    <p>Efficiently schedule and manage patient appointments with our intuitive system.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center p-4">
+                    <i class="bi bi-file-medical display-4 mb-3"></i>
+                    <h3>Patient Records</h3>
+                    <p>Maintain comprehensive digital records for all your patients.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center p-4">
+                    <i class="bi bi-capsule display-4 mb-3"></i>
+                    <h3>Pharmacy Management</h3>
+                    <p>Streamline your pharmacy operations with our integrated system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="container py-5 bg-light">
+        <h2 class="text-center mb-5">Why Choose MediTrack?</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="benefit-item text-center">
+                    <i class="bi bi-graph-up display-4 mb-3"></i>
+                    <h4>Improved Efficiency</h4>
+                    <p>Streamline your operations and save time.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="benefit-item text-center">
+                    <i class="bi bi-shield-check display-4 mb-3"></i>
+                    <h4>Enhanced Security</h4>
+                    <p>Keep patient data safe and secure.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="benefit-item text-center">
+                    <i class="bi bi-bar-chart display-4 mb-3"></i>
+                    <h4>Better Analytics</h4>
+                    <p>Make data-driven decisions with insights.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="benefit-item text-center">
+                    <i class="bi bi-people display-4 mb-3"></i>
+                    <h4>Staff Management</h4>
+                    <p>Efficiently manage your healthcare team.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="container py-5">
+        <div class="text-center">
+            <h2 class="mb-4">Ready to Transform Your Healthcare Management?</h2>
+            <p class="lead mb-4">Join the growing number of healthcare providers using MediTrack.</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Get Started Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

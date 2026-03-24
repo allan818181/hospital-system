@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Pharmacist Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Pharmacist Dashboard</h3>
+                    <div class="card-tools">
+                        <form class="form-inline" method="get">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search" placeholder="Search patients or medicines..." value="{{ search_query }}">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Suggested Medicines Section -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Suggested Medicines to Prescribe</h5>
+                            {% if suggested_medicines %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Patient Name</th>
+                                                <th>Medicine</th>
+                                                <th>Prescribed By</th>
+                                                <th>Dosage</th>
+                                                <th>Frequency</th>
+                                                <th>Duration</th>
+                                                <th>Instructions</th>
+                                                <th>Date Suggested</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for prescription in suggested_medicines %}
+                                            <tr>
+                                                <td>{{ prescription.appointment.patient.user.get_full_name }}</td>
+                                                <td>{{ prescription.medication_name }}</td>
+                                                <td>Dr. {{ prescription.prescribed_by.user.get_full_name }}</td>
+                                                <td>{{ prescription.dosage|default:"Not specified" }}</td>
+                                                <td>{{ prescription.frequency|default:"Not specified" }}</td>
+                                                <td>{{ prescription.duration|default:"Not specified" }}</td>
+                                                <td>{{ prescription.instructions|default:"No instructions" }}</td>
+                                                <td>{{ prescription.created_at|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <a href="{% url 'prescribe_medicine' prescription.id %}" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-pills"></i> Prescribe & Schedule
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No suggested medicines to prescribe at the moment.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Schedule New Appointment{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="bi bi-calendar-plus me-2"></i>
+        Schedule New Appointment
+    </h1>
+    <a href="{% url 'appointment_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Appointments
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Patient*</label>
+                    <select name="patient" class="form-select" required>
+                        <option value="">Select Patient</option>
+                        {% for patient in patients %}
+                        <option value="{{ patient.id }}" 
+                            {% if initial_patient and initial_patient.id == patient.id %}selected{% endif %}>
+                            {{ patient.user.get_full_name }} ({{ patient.user.phone }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Doctor*</label>
+                    <select name="doctor" class="form-select" required>
+                        <option value="">Select Doctor</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">
+                            Dr. {{ doctor.user.get_full_name }} ({{ doctor.specialization }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Date & Time*</label>
+                    <input type="datetime-local" name="date_time" 
+                           class="form-control" required 
+                           value="{{ default_date }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Duration (minutes)</label>
+                    <select name="duration" class="form-select">
+                        <option value="15">15 minutes</option>
+                        <option value="30" selected>30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">60 minutes</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Reason for Visit*</label>
+                <textarea name="reason" class="form-control" rows="3" required 
+                          placeholder="Describe the reason for the appointment"></textarea>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="reset" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-eraser"></i> Clear Form
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-calendar-check"></i> Schedule Appointment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    textarea.form-control {
+        min-height: 100px;
+    }
+</style>
+{% endblock %}

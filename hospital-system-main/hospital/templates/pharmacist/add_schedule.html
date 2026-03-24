@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Medication Schedule{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Add Medication Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Prescription Details</h5>
+                        <p><strong>Patient:</strong> {{ patient.user.get_full_name }}</p>
+                        <p><strong>Medicine:</strong> {{ prescription.medicine }}</p>
+                        <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
+                        <p><strong>Frequency:</strong> {{ prescription.frequency }}</p>
+                        <p><strong>Duration:</strong> {{ prescription.duration }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Time Slots</label>
+                            <div id="time-slots">
+                                {% for time in default_times %}
+                                <div class="input-group mb-2">
+                                    <input type="time" name="time_slots" class="form-control" value="{{ time }}" required>
+                                    <button type="button" class="btn btn-outline-danger remove-time" {% if forloop.first %}disabled{% endif %}>
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-time">
+                                <i class="bi bi-plus"></i> Add Time Slot
+                            </button>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="start_date" class="form-control" value="{{ default_start|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="end_date" class="form-control" value="{{ default_end|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Additional Instructions</label>
+                            <textarea name="instructions" class="form-control" rows="3" placeholder="Enter any additional instructions for the patient...">{{ prescription.notes }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'pharmacist_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Schedule</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timeSlots = document.getElementById('time-slots');
+    const addTimeBtn = document.getElementById('add-time');
+    
+    // Add new time slot
+    addTimeBtn.addEventListener('click', function() {
+        const timeSlot = document.createElement('div');
+        timeSlot.className = 'input-group mb-2';
+        timeSlot.innerHTML = `
+            <input type="time" name="time_slots" class="form-control" required>
+            <button type="button" class="btn btn-outline-danger remove-time">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+        timeSlots.appendChild(timeSlot);
+        updateRemoveButtons();
+    });
+    
+    // Remove time slot
+    timeSlots.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-time')) {
+            e.target.closest('.input-group').remove();
+            updateRemoveButtons();
+        }
+    });
+    
+    // Update remove buttons state
+    function updateRemoveButtons() {
+        const removeButtons = timeSlots.querySelectorAll('.remove-time');
+        removeButtons.forEach(button => {
+            button.disabled = removeButtons.length === 1;
+        });
+    }
+});
+</script>
+{% endblock %}

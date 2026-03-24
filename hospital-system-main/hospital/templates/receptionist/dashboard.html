@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Receptionist Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Receptionist Dashboard</h2>
+    
+    <!-- Search Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Quick Actions</h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="{% url 'add_patient' %}" class="btn btn-primary w-100">
+                        <i class="bi bi-person-plus"></i> Add New Patient
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'patient_list' %}" class="btn btn-info w-100">
+                        <i class="bi bi-people"></i> View All Patients
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'appointment_list' %}" class="btn btn-success w-100">
+                        <i class="bi bi-calendar-check"></i> Manage Appointments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search by patient name..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'receptionist_dashboard' %}" class="btn btn-secondary">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">Appointments</h3>
+            <a href="{% url 'add_appointment' %}" class="btn btn-primary">Add Appointment</a>
+        </div>
+        <div class="card-body">
+            {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.date_time|date:"M d, Y h:i A" }}</td>
+                                    <td>{{ appointment.patient.user.get_full_name }}</td>
+                                    <td>Dr. {{ appointment.doctor.user.last_name }}</td>
+                                    <td>{{ appointment.reason|truncatechars:50 }}</td>
+                                    <td>
+                                        <span class="badge {% if appointment.status == 'SCHEDULED' %}bg-primary{% elif appointment.status == 'COMPLETED' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'patient_detail' appointment.patient.id %}" class="btn btn-sm btn-info">View Patient</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No appointments found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    
+</div>
+{% endblock %}

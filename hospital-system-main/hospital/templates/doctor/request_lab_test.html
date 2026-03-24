@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Lab Test{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Request Lab Test</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="appointment" class="form-label">Select Patient</label>
+                            <select name="appointment" id="appointment" class="form-select" required>
+                                <option value="">Select a patient...</option>
+                                {% for appointment in appointments %}
+                                <option value="{{ appointment.id }}">
+                                    {{ appointment.patient.user.get_full_name }} - {{ appointment.date_time|date:"M d, Y" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="test_name" class="form-label">Test Name</label>
+                            <input type="text" class="form-control" id="test_name" name="test_name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="instructions" class="form-label">Instructions</label>
+                            <textarea class="form-control" id="instructions" name="instructions" rows="3" required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-clipboard2-pulse"></i> Request Test
+                            </button>
+                            <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

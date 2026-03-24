@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Prescription{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Schedule Prescription</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <h5>Patient Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> {{ patient.user.get_full_name }}</p>
+                                <p><strong>Age:</strong> {{ patient.age }}</p>
+                                <p><strong>Gender:</strong> {{ patient.gender }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Phone:</strong> {{ patient.user.phone }}</p>
+                                <p><strong>Emergency Contact:</strong> {{ patient.emergency_contact }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Prescription Details</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Medicine:</strong> {{ prescription.medicine }}</p>
+                                <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
+                                <p><strong>Frequency:</strong> {{ prescription.frequency }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Duration:</strong> {{ prescription.duration }}</p>
+                                <p><strong>Notes:</strong> {{ prescription.notes|default:"None" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h5>Schedule Details</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Start Date*</label>
+                                    <input type="date" name="start_date" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">End Date*</label>
+                                    <input type="date" name="end_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reminder Times*</label>
+                                <div class="input-group">
+                                    <input type="time" name="reminder_times" class="form-control" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="addTime">
+                                        Add Time
+                                    </button>
+                                </div>
+                                <div id="timeList" class="mt-2">
+                                    <!-- Added times will appear here -->
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Additional Instructions</label>
+                                <textarea name="instructions" class="form-control" rows="2" 
+                                          placeholder="Any special instructions for the patient"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'pharmacist_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                            <button type="submit" class="btn btn-primary">Schedule Prescription</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('addTime').addEventListener('click', function() {
+    const timeInput = document.querySelector('input[name="reminder_times"]');
+    const timeList = document.getElementById('timeList');
+    
+    if (timeInput.value) {
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'd-flex align-items-center mb-2';
+        timeDiv.innerHTML = `
+            <input type="time" name="reminder_times[]" class="form-control me-2" value="${timeInput.value}" readonly>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+        `;
+        timeList.appendChild(timeDiv);
+        timeInput.value = '';
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

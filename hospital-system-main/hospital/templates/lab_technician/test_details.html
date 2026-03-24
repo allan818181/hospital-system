@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Test Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Lab Test Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Patient Information</h5>
+                        <p><strong>Name:</strong> {{ lab_test.appointment.patient.user.get_full_name }}</p>
+                        <p><strong>Age:</strong> {{ lab_test.appointment.patient.age }}</p>
+                        <p><strong>Gender:</strong> {{ lab_test.appointment.patient.gender }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Test Information</h5>
+                        <p><strong>Test Name:</strong> {{ lab_test.test_name }}</p>
+                        <p><strong>Requested By:</strong> Dr. {{ lab_test.requested_by.user.get_full_name }}</p>
+                        <p><strong>Instructions:</strong> {{ lab_test.instructions }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge {% if lab_test.status == 'PENDING' %}bg-warning{% elif lab_test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                {{ lab_test.status }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status</label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="PENDING" {% if lab_test.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                                <option value="IN_PROGRESS" {% if lab_test.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                <option value="COMPLETED" {% if lab_test.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="results" class="form-label">Test Results</label>
+                            <textarea name="results" id="results" class="form-control" rows="5" required>{{ lab_test.results }}</textarea>
+                            <div class="form-text">Enter detailed test results and measurements.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Results</button>
+                            <a href="{% url 'lab_technician_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

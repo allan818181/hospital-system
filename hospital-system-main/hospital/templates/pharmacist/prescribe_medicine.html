@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescribe and Schedule Medicine{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Prescribe and Schedule Medicine</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Patient Information</h5>
+                        <p><strong>Name:</strong> {{ prescription.appointment.patient.user.get_full_name }}</p>
+                        <p><strong>Medicine:</strong> {{ prescription.medication_name }}</p>
+                        <p><strong>Suggested By:</strong> Dr. {{ prescription.prescribed_by.user.get_full_name }}</p>
+                    </div>
+
+                    <form method="post" id="prescriptionForm">
+                        {% csrf_token %}
+                        <!-- Prescription Section -->
+                        <div class="mb-4">
+                            <h5>Prescription Details</h5>
+                            <div class="mb-3">
+                                <label for="dosage" class="form-label">Dosage</label>
+                                <input type="text" class="form-control" id="dosage" name="dosage" placeholder="e.g., 500mg" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="frequency" class="form-label">Frequency</label>
+                                <select class="form-select" id="frequency" name="frequency" required>
+                                    <option value="">Select frequency...</option>
+                                    <option value="Once daily">Once daily</option>
+                                    <option value="Twice daily">Twice daily</option>
+                                    <option value="Three times daily">Three times daily</option>
+                                    <option value="Four times daily">Four times daily</option>
+                                    <option value="As needed">As needed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="duration" class="form-label">Duration</label>
+                                <input type="text" class="form-control" id="duration" name="duration" placeholder="e.g., 7 days" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="instructions" class="form-label">Instructions</label>
+                                <textarea class="form-control" id="instructions" name="instructions" rows="3" placeholder="Enter any specific instructions for taking the medicine"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Section -->
+                        <div class="mb-4">
+                            <h5>Medication Schedule</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Please set time slots according to the medication's frequency:
+                                <ul class="mb-0 mt-2">
+                                    <li>Once daily: Set one time slot</li>
+                                    <li>Twice daily: Set two time slots (e.g., morning and evening)</li>
+                                    <li>Three times daily: Set three time slots (e.g., morning, afternoon, evening)</li>
+                                    <li>Four times daily: Set four time slots</li>
+                                    <li>As needed: Set appropriate time slots based on patient's schedule</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ default_start|date:'Y-m-d' }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ default_end|date:'Y-m-d' }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Time Slots</label>
+                                <div id="timeSlotsContainer">
+                                    <!-- Default Time Slot 1 -->
+                                    <div class="time-slot-item card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0">Time Slot 1</h6>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTimeSlot(this)">
+                                                    <i class="bi bi-trash"></i> Remove
+                                                </button>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Time</label>
+                                                <input type="time" name="time_slots[]" class="form-control" value="08:00" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Default Time Slot 2 -->
+                                    <div class="time-slot-item card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0">Time Slot 2</h6>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTimeSlot(this)">
+                                                    <i class="bi bi-trash"></i> Remove
+                                                </button>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Time</label>
+                                                <input type="time" name="time_slots[]" class="form-control" value="14:00" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Default Time Slot 3 -->
+                                    <div class="time-slot-item card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0">Time Slot 3</h6>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTimeSlot(this)">
+                                                    <i class="bi bi-trash"></i> Remove
+                                                </button>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Time</label>
+                                                <input type="time" name="time_slots[]" class="form-control" value="20:00" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary mt-2" onclick="addTimeSlot()">
+                                    <i class="bi bi-plus-circle"></i> Add Another Time Slot
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Prescribe and Schedule</button>
+                            <a href="{% url 'pharmacist_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addTimeSlot(time = '') {
+    const container = document.getElementById('timeSlotsContainer');
+    const timeSlotCount = container.children.length + 1;
+    
+    const timeSlotDiv = document.createElement('div');
+    timeSlotDiv.className = 'time-slot-item card mb-3';
+    timeSlotDiv.innerHTML = `
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Time Slot ${timeSlotCount}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTimeSlot(this)">
+                    <i class="bi bi-trash"></i> Remove
+                </button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Time</label>
+                <input type="time" name="time_slots[]" class="form-control" value="${time}" required>
+            </div>
+        </div>
+    `;
+    container.appendChild(timeSlotDiv);
+}
+
+function removeTimeSlot(button) {
+    const timeSlotItem = button.closest('.time-slot-item');
+    timeSlotItem.remove();
+    updateTimeSlotNumbers();
+}
+
+function updateTimeSlotNumbers() {
+    const container = document.getElementById('timeSlotsContainer');
+    const timeSlots = container.getElementsByClassName('time-slot-item');
+    for (let i = 0; i < timeSlots.length; i++) {
+        const title = timeSlots[i].querySelector('h6');
+        title.textContent = `Time Slot ${i + 1}`;
+    }
+}
+
+function updateTimeSlotsForFrequency(frequency) {
+    const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+    const currentSlots = timeSlotsContainer.getElementsByClassName('time-slot-item');
+    const currentCount = currentSlots.length;
+    
+    let requiredSlots = 1;
+    let defaultTimes = ['08:00'];
+
+    switch (frequency) {
+        case 'Once daily':
+            requiredSlots = 1;
+            defaultTimes = ['08:00'];
+            break;
+        case 'Twice daily':
+            requiredSlots = 2;
+            defaultTimes = ['08:00', '20:00'];
+            break;
+        case 'Three times daily':
+            requiredSlots = 3;
+            defaultTimes = ['08:00', '14:00', '20:00'];
+            break;
+        case 'Four times daily':
+            requiredSlots = 4;
+            defaultTimes = ['08:00', '12:00', '16:00', '20:00'];
+            break;
+        default:
+            requiredSlots = 1;
+            defaultTimes = ['08:00'];
+    }
+
+    // Clear existing slots
+    timeSlotsContainer.innerHTML = '';
+
+    // Add new slots based on frequency
+    for (let i = 0; i < requiredSlots; i++) {
+        addTimeSlot(defaultTimes[i]);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const frequencySelect = document.getElementById('frequency');
+    const prescriptionForm = document.getElementById('prescriptionForm');
+
+    // Handle frequency change
+    frequencySelect.addEventListener('change', function() {
+        updateTimeSlotsForFrequency(this.value);
+    });
+
+    // Form submission validation
+    prescriptionForm.addEventListener('submit', function(e) {
+        const timeSlots = document.querySelectorAll('input[name="time_slots[]"]');
+        if (timeSlots.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one time slot for the medication schedule.');
+            return;
+        }
+
+        // Validate that all required fields are filled
+        const requiredFields = ['dosage', 'frequency', 'duration', 'start_date', 'end_date'];
+        for (const field of requiredFields) {
+            const input = document.getElementById(field);
+            if (!input.value) {
+                e.preventDefault();
+                alert(`Please fill in the ${field.replace('_', ' ')} field.`);
+                input.focus();
+                return;
+            }
+        }
+
+        // Validate that all time slots have values
+        for (const slot of timeSlots) {
+            if (!slot.value) {
+                e.preventDefault();
+                alert('Please fill in all time slots.');
+                slot.focus();
+                return;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

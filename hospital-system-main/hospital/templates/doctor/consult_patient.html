@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Consult Patient{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Consult Patient</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Patient Information</h5>
+                        <p><strong>Name:</strong> {{ patient.user.get_full_name }}</p>
+                        <p><strong>Age:</strong> {{ patient.age }}</p>
+                        <p><strong>Gender:</strong> {{ patient.gender }}</p>
+                    </div>
+
+                    <form method="post" id="consultationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Lab Tests Section -->
+                        <div class="mb-4">
+                            <h5>Request Lab Tests</h5>
+                            <div id="labTestsContainer">
+                                <div class="lab-test-entry mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="text" name="lab_tests" class="form-control" placeholder="Test Name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" name="lab_instructions" class="form-control" placeholder="Instructions">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addLabTest()">
+                                <i class="bi bi-plus"></i> Add Another Test
+                            </button>
+                        </div>
+
+                        <!-- Consultation Notes -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Consultation Notes</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3">{{ appointment.notes }}</textarea>
+                        </div>
+
+                        <!-- Prescription Section -->
+                        <div class="mb-3">
+                            <h5>Prescription</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="medicine" class="form-label">Medicine</label>
+                                        <input type="text" name="medicine" id="medicine" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dosage" class="form-label">Dosage</label>
+                                        <input type="text" name="dosage" id="dosage" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="frequency" class="form-label">Frequency</label>
+                                        <input type="text" name="frequency" id="frequency" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="duration" class="form-label">Duration</label>
+                                        <input type="text" name="duration" id="duration" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="prescription_notes" class="form-label">Additional Notes</label>
+                                <textarea name="prescription_notes" id="prescription_notes" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Complete Consultation</button>
+                            <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addLabTest() {
+    const container = document.getElementById('labTestsContainer');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'lab-test-entry mb-3';
+    newEntry.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" name="lab_tests" class="form-control" placeholder="Test Name">
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="lab_instructions" class="form-control" placeholder="Instructions">
+            </div>
+        </div>
+    `;
+    container.appendChild(newEntry);
+}
+</script>
+{% endblock %} 

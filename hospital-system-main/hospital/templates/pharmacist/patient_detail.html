@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Prescription Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Patient Prescription Details</h3>
+                    <div class="card-tools">
+                        <a href="{% url 'pharmacist_patient_history' %}" class="btn btn-default">
+                            <i class="fas fa-arrow-left"></i> Back to Patient History
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Patient Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Patient Information</h5>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Name:</th>
+                                    <td>{{ patient.user.get_full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Age:</th>
+                                    <td>{{ patient.age }} years</td>
+                                </tr>
+                                <tr>
+                                    <th>Gender:</th>
+                                    <td>{{ patient.gender }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Blood Group:</th>
+                                    <td>{{ patient.blood_group|default:"Not specified" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Prescription History -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Prescription History</h5>
+                            {% if prescriptions %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicine</th>
+                                                <th>Prescribed By</th>
+                                                <th>Dosage</th>
+                                                <th>Frequency</th>
+                                                <th>Duration</th>
+                                                <th>Status</th>
+                                                <th>Schedule</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for prescription in prescriptions %}
+                                            <tr>
+                                                <td>{{ prescription.medication_name }}</td>
+                                                <td>Dr. {{ prescription.prescribed_by.user.get_full_name }}</td>
+                                                <td>{{ prescription.dosage }}</td>
+                                                <td>{{ prescription.frequency }}</td>
+                                                <td>{{ prescription.duration }}</td>
+                                                <td>
+                                                    <span class="badge badge-{% if prescription.status == 'SCHEDULED' %}success{% elif prescription.status == 'PRESCRIBED' %}warning{% else %}info{% endif %}">
+                                                        {{ prescription.get_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% for schedule in medication_schedules %}
+                                                        {% if schedule.prescription == prescription %}
+                                                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#scheduleModal{{ schedule.id }}">
+                                                                View Schedule
+                                                            </button>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No prescription history found for this patient.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Modals -->
+{% for schedule in medication_schedules %}
+<div class="modal fade" id="scheduleModal{{ schedule.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Medication Schedule</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Start Date:</strong> {{ schedule.start_date }}</p>
+                <p><strong>End Date:</strong> {{ schedule.end_date }}</p>
+                <p><strong>Time Slots:</strong></p>
+                <ul>
+                    {% for time in schedule.time_slots %}
+                        <li>{{ time }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %} 

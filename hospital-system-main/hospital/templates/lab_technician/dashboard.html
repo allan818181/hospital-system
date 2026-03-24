@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Technician Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Lab Test Queue</h2>
+        </div>
+        <div class="col-md-4">
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Search by patient name or test..." value="{{ search_query }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+
+    {% if tests_by_appointment %}
+        {% for appointment_id, data in tests_by_appointment.items %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        Patient: {{ data.patient.user.get_full_name }}
+                        <small class="text-muted">(Appointment: {{ data.appointment.date_time|date:"F j, Y" }})</small>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Instructions</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for test in data.tests %}
+                                    <tr>
+                                        <td>{{ test.test_name }}</td>
+                                        <td>{{ test.instructions }}</td>
+                                        <td>
+                                            <span class="badge {% if test.status == 'PENDING' %}bg-warning{% elif test.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                                                {{ test.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if test.status != 'COMPLETED' %}
+                                                <a href="{% url 'update_lab_test' test.id %}" class="btn btn-primary btn-sm">
+                                                    Enter Results
+                                                </a>
+                                            {% else %}
+                                                <span class="text-success">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            No pending lab tests found.
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

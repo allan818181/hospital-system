@@ -1,0 +1,98 @@
+{% extends 'templates/base.html' %}
+{% block title %}Prescription List{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="bi bi-prescription me-2"></i>
+        Prescription Management
+    </h1>
+    {% if user_role == 'DOCTOR' %}
+    <a href="#" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Create Prescription
+    </a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.appointment.date_time|date:"M d, Y" }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-person-circle fs-4 text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    {{ prescription.appointment.patient.user.get_full_name }}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            Dr. {{ prescription.appointment.doctor.user.last_name }}
+                        </td>
+                        <td>{{ prescription.medicine }}</td>
+                        <td>{{ prescription.dosage }}</td>
+                        <td>
+                            {% if prescription.medicationschedule %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Scheduled
+                            </span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-clock"></i> Pending
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="#" class="btn btn-outline-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if user_role == 'PHARMACIST' and not prescription.medicationschedule %}
+                                <a href="#" class="btn btn-outline-success" title="Schedule">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="bi bi-exclamation-circle fs-1 text-muted"></i>
+                            <p class="mt-2 mb-0">No prescriptions found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table th {
+        white-space: nowrap;
+    }
+    .badge {
+        font-size: 0.85em;
+        padding: 0.35em 0.65em;
+    }
+</style>
+{% endblock %}

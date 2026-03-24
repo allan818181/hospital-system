@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load hospital_extras %}
+
+{% block title %}Update Lab Test Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Update Lab Test Results</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Patient Information</h5>
+                        <p><strong>Patient:</strong> {{ lab_test.appointment.patient.user.get_full_name }}</p>
+                        <p><strong>Appointment Date:</strong> {{ lab_test.appointment.date_time|date:"F j, Y" }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ lab_test.test_name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Instructions:</strong> {{ lab_test.instructions }}</p>
+                                <div class="mb-3">
+                                    {{ form.as_p }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'lab_technician_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                            <button type="submit" class="btn btn-primary">Save Results</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
