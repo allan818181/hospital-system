@@ -41,4 +41,4 @@ This system supports both **in-hospital and at-home care**, ensuring caregivers 
 ## ⚙️ Installation and Setup
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/Veenbreeze/hospital-system.git
+   git clone https://github.com/allan818181/hospital-system
